@@ -1,9 +1,9 @@
-# Template - IBM HTTP Server V855 Liberty ready on a single VM
+# Template - IBM HTTP Server V8.5.5 Liberty ready on a single virtual machine
 Template Version - 1.0
 
 ## Description
 
-This template will create a IBM HTTP Server V8.5.5.x on a single VM, ready for use with WebSpher Liberty Server<br>
+This template will create a IBM HTTP Server V8.5.5.x on a single VM, ready for use with WebSphere Liberty Server<br>
 
 ## Features
 
@@ -28,7 +28,7 @@ Ubuntu 16.04<br>
 <br>
 ### Software Deployed
 
-IBM HTTP Server for WebSphere Application Server V9<br>
+IBM HTTP Server for WebSphere Application Server V8.5.5<br>
 IBM SDK, Java Technology Edition V8<br>
 <br>
 ### Default Virtual Machine Settings
@@ -38,9 +38,8 @@ IBM SDK, Java Technology Edition V8<br>
 ### Usage and Special Notes
 
 1. The user is responsible for obtaining appropriate software licenses and downloads prior to template deployment.<br>
-2. IBM Knowledge Center for IBM HTTP Server 8.5.5.x - https://www.ibm.com/support/knowledgecenter/en/SSEQTJ_8.5.5/com.ibm.websphere.ihs.doc/ihs/welcome_ihs.html<br>
-3. IBM Support Portal - https://www.ibm.com/support/home/<br>
-<br>
+2. IBM Knowledge Center for IBM HTTP Server 8.5.5.x - <a href=\"https://www.ibm.com/support/knowledgecenter/en/SSEQTJ_8.5.5/com.ibm.websphere.ihs.doc/ihs/welcome_ihs.html\" target=\"_blank\">https://www.ibm.com/support/knowledgecenter/en/SSEQTJ_8.5.5/com.ibm.websphere.ihs.doc/ihs/welcome_ihs.html</a><br>
+3. IBM Support Portal - <a href=\"https://www.ibm.com/support/home/\" target=\"_blank\">https://www.ibm.com/support/home/</a><br>
 
 
 ## Overview
