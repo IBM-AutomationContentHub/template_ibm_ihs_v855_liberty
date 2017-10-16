@@ -3,7 +3,7 @@ Template Version - 1.0
 
 ## Description
 
-This template will create a IBM HTTP Server V8.5.5.x on a single VM, ready for use with WebSphere Liberty Server<br>
+This template deploys IBM HTTP Server V8.5.5 on a single virtual machine ready for use with WebSphere Liberty Server.<br>
 
 ## Features
 
@@ -20,6 +20,7 @@ This template will create a IBM HTTP Server V8.5.5.x on a single VM, ready for u
 Red Hat Enterprise Linux 7<br>
 Red Hat Enterprise Linux 6<br>
 Ubuntu 16.04<br>
+Ubuntu 14.04<br>
 <br>
 ### Topology
 
@@ -33,13 +34,14 @@ IBM SDK, Java Technology Edition V8<br>
 <br>
 ### Default Virtual Machine Settings
 
- vCPU = 2, Memory = 4GB, Storage = 25GB<br>
+ vCPU 2, Memory (GB) 4<br>
 <br>
 ### Usage and Special Notes
 
 1. The user is responsible for obtaining appropriate software licenses and downloads prior to template deployment.<br>
-2. IBM Knowledge Center for IBM HTTP Server 8.5.5.x - <a href=\"https://www.ibm.com/support/knowledgecenter/en/SSEQTJ_8.5.5/com.ibm.websphere.ihs.doc/ihs/welcome_ihs.html\" target=\"_blank\">https://www.ibm.com/support/knowledgecenter/en/SSEQTJ_8.5.5/com.ibm.websphere.ihs.doc/ihs/welcome_ihs.html</a><br>
+2. IBM Knowledge Center for IBM HTTP Server V8.5.5 - <a href=\"https://www.ibm.com/support/knowledgecenter/en/SSEQTJ_8.5.5/com.ibm.websphere.ihs.doc/ihs/welcome_ihs.html\" target=\"_blank\">https://www.ibm.com/support/knowledgecenter/en/SSEQTJ_8.5.5/com.ibm.websphere.ihs.doc/ihs/welcome_ihs.html</a><br>
 3. IBM Support Portal - <a href=\"https://www.ibm.com/support/home/\" target=\"_blank\">https://www.ibm.com/support/home/</a><br>
+<br>
 
 
 ## Overview
