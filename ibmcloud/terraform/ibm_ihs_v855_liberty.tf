@@ -11,31 +11,26 @@
 ##############################################################
 # Keys - CAMC (public/private) & optional User Key (public) 
 ##############################################################
-variable "user_public_ssh_key" {
-  type = "string"
-  description = "User defined public SSH key used to connect to the virtual machine. The format must be in openSSH."
-  default = "None"
-}
-
-variable "ibm_pm_public_ssh_key" {
-  description = "Public CAMC SSH key value which is used to connect to a guest, used on VMware only."
+variable "ibm_pm_public_ssh_key_name" {
+  description = "Public CAMC SSH key name used to connect to the virtual guest."
 }
 
 variable "ibm_pm_private_ssh_key" {
   description = "Private CAMC SSH key (base64 encoded) used to connect to the virtual guest."
 }
 
-variable "allow_unverified_ssl" {
-  description = "Communication with vsphere server with self signed certificate"
-  default = "true"
+variable "user_public_ssh_key" {
+  type = "string"
+  description = "User defined public SSH key used to connect to the virtual machine. The format must be in openSSH."
+  default = "None"
 }
 
 ##############################################################
-# Define the vsphere provider 
+# Define the ibm provider 
 ##############################################################
-provider "vsphere" {
-  allow_unverified_ssl = "${var.allow_unverified_ssl}"
-  version = "~> 0.4"
+#define the ibm provider
+provider "ibm" {
+  version = "~> 0.5"
 }
 
 provider "camc" {
@@ -44,6 +39,14 @@ provider "camc" {
 
 provider "random" {
   version = "~> 1.0"
+}
+
+##############################################################
+# Reference public key in Devices>Manage>SSH Keys in SL console) 
+##############################################################
+data "ibm_compute_ssh_key" "ibm_pm_public_key" {
+  label = "${var.ibm_pm_public_ssh_key_name}"
+  most_recent = "true"
 }
 
 resource "random_id" "stack_id" {
@@ -59,6 +62,14 @@ variable "ibm_stack_name" {
 }
 
 #### Default OS Admin User Map ####
+variable "default_os_admin_user" {
+  type        = "map"
+  description = "look up os_admin_user using resource image"
+  default = {
+    UBUNTU_16_64 = "root"
+    REDHAT_7_64 = "root"
+  }
+}
 
 ##### Environment variables #####
 #Variable : ibm_im_repo
@@ -117,6 +128,14 @@ variable "ibm_sw_repo_user" {
 variable "IHSLibertyV855Node01-image" {
   type = "string"
   description = "Operating system image id / template that should be used when creating the virtual image"
+  default = "REDHAT_7_64"
+}
+
+#Variable : IHSLibertyV855Node01-mgmt-network-public
+variable "IHSLibertyV855Node01-mgmt-network-public" {
+  type = "string"
+  description = "Expose and use public IP of virtual machine for internal communication"
+  default = "true"
 }
 
 #Variable : IHSLibertyV855Node01-name
@@ -223,127 +242,106 @@ variable "IHSLibertyV855Node01_ihs_version" {
 }
 
 
+##### ungrouped variables #####
+##### domain name #####
+variable "runtime_domain" {
+  description = "domain name"
+  default = "cam.ibm.com"
+}
+
+
 #########################################################
 ##### Resource : IHSLibertyV855Node01
 #########################################################
 
-variable "IHSLibertyV855Node01-os_password" {
-  type = "string"
-  description = "Operating System Password for the Operating System User to access virtual machine"
-}
 
-variable "IHSLibertyV855Node01_folder" {
-  description = "Target vSphere folder for virtual machine"
-}
-
+#Parameter : IHSLibertyV855Node01_datacenter
 variable "IHSLibertyV855Node01_datacenter" {
-  description = "Target vSphere datacenter for virtual machine creation"
-}
-
-variable "IHSLibertyV855Node01_domain" {
-  description = "Domain Name of virtual machine"
-}
-
-variable "IHSLibertyV855Node01_number_of_vcpu" {
-  description = "Number of virtual CPU for the virtual machine, which is required to be a positive Integer"
-  default = "2"
-}
-
-variable "IHSLibertyV855Node01_memory" {
-  description = "Memory assigned to the virtual machine in megabytes. This value is required to be an increment of 1024"
-  default = "2048"
-}
-
-variable "IHSLibertyV855Node01_cluster" {
-  description = "Target vSphere cluster to host the virtual machine"
-}
-
-variable "IHSLibertyV855Node01_dns_suffixes" {
-  type = "list"
-  description = "Name resolution suffixes for the virtual network adapter"
-}
-
-variable "IHSLibertyV855Node01_dns_servers" {
-  type = "list"
-  description = "DNS servers for the virtual network adapter"
-}
-
-variable "IHSLibertyV855Node01_network_interface_label" {
-  description = "vSphere port group or network label for virtual machine's vNIC"
-}
-
-variable "IHSLibertyV855Node01_ipv4_gateway" {
-  description = "IPv4 gateway for vNIC configuration"
-}
-
-variable "IHSLibertyV855Node01_ipv4_address" {
-  description = "IPv4 address for vNIC configuration"
-}
-
-variable "IHSLibertyV855Node01_ipv4_prefix_length" {
-  description = "IPv4 prefix length for vNIC configuration. The value must be a number between 8 and 32"
-}
-
-variable "IHSLibertyV855Node01_adapter_type" {
-  description = "Network adapter type for vNIC Configuration"
-  default = "vmxnet3"
-}
-
-variable "IHSLibertyV855Node01_root_disk_datastore" {
-  description = "Data store or storage cluster name for target virtual machine's disks"
-}
-
-variable "IHSLibertyV855Node01_root_disk_type" {
   type = "string"
-  description = "Type of template disk volume"
-  default = "eager_zeroed"
+  description = "IBMCloud datacenter where infrastructure resources will be deployed"
+  default = "dal05"
 }
 
-variable "IHSLibertyV855Node01_root_disk_controller_type" {
-  type = "string"
-  description = "Type of template disk controller"
-  default = "scsi"
-}
 
-variable "IHSLibertyV855Node01_root_disk_keep_on_remove" {
+#Parameter : IHSLibertyV855Node01_private_network_only
+variable "IHSLibertyV855Node01_private_network_only" {
   type = "string"
-  description = "Delete template disk volume when the virtual machine is deleted"
+  description = "Provision the virtual machine with only private IP"
   default = "false"
 }
 
-# vsphere vm
-resource "vsphere_virtual_machine" "IHSLibertyV855Node01" {
-  name = "${var.IHSLibertyV855Node01-name}"
-  domain = "${var.IHSLibertyV855Node01_domain}"
-  folder = "${var.IHSLibertyV855Node01_folder}"
+
+#Parameter : IHSLibertyV855Node01_number_of_cores
+variable "IHSLibertyV855Node01_number_of_cores" {
+  type = "string"
+  description = "Number of CPU cores, which is required to be a positive Integer"
+  default = "2"
+}
+
+
+#Parameter : IHSLibertyV855Node01_memory
+variable "IHSLibertyV855Node01_memory" {
+  type = "string"
+  description = "Amount of Memory (MBs), which is required to be one or more times of 1024"
+  default = "2048"
+}
+
+
+#Parameter : IHSLibertyV855Node01_network_speed
+variable "IHSLibertyV855Node01_network_speed" {
+  type = "string"
+  description = "Bandwidth of network communication applied to the virtual machine"
+  default = "10"
+}
+
+
+#Parameter : IHSLibertyV855Node01_hourly_billing
+variable "IHSLibertyV855Node01_hourly_billing" {
+  type = "string"
+  description = "Billing cycle: hourly billed or monthly billed"
+  default = "true"
+}
+
+
+#Parameter : IHSLibertyV855Node01_dedicated_acct_host_only
+variable "IHSLibertyV855Node01_dedicated_acct_host_only" {
+  type = "string"
+  description = "Shared or dedicated host, where dedicated host usually means higher performance and cost"
+  default = "false"
+}
+
+
+#Parameter : IHSLibertyV855Node01_local_disk
+variable "IHSLibertyV855Node01_local_disk" {
+  type = "string"
+  description = "User local disk or SAN disk"
+  default = "false"
+}
+
+variable "IHSLibertyV855Node01_root_disk_size" {
+  type = "string"
+  description = "Root Disk Size - IHSLibertyV855Node01"
+  default = "25"
+}
+
+resource "ibm_compute_vm_instance" "IHSLibertyV855Node01" {
+  hostname = "${var.IHSLibertyV855Node01-name}"
+  os_reference_code = "${var.IHSLibertyV855Node01-image}"
+  domain = "${var.runtime_domain}"
   datacenter = "${var.IHSLibertyV855Node01_datacenter}"
-  vcpu = "${var.IHSLibertyV855Node01_number_of_vcpu}"
+  network_speed = "${var.IHSLibertyV855Node01_network_speed}"
+  hourly_billing = "${var.IHSLibertyV855Node01_hourly_billing}"
+  private_network_only = "${var.IHSLibertyV855Node01_private_network_only}"
+  cores = "${var.IHSLibertyV855Node01_number_of_cores}"
   memory = "${var.IHSLibertyV855Node01_memory}"
-  cluster = "${var.IHSLibertyV855Node01_cluster}"
-  dns_suffixes = "${var.IHSLibertyV855Node01_dns_suffixes}"
-  dns_servers = "${var.IHSLibertyV855Node01_dns_servers}"
-
-  network_interface {
-    label = "${var.IHSLibertyV855Node01_network_interface_label}"
-    ipv4_gateway = "${var.IHSLibertyV855Node01_ipv4_gateway}"
-    ipv4_address = "${var.IHSLibertyV855Node01_ipv4_address}"
-    ipv4_prefix_length = "${var.IHSLibertyV855Node01_ipv4_prefix_length}"
-    adapter_type = "${var.IHSLibertyV855Node01_adapter_type}"
-  }
-
-  disk {
-    type = "${var.IHSLibertyV855Node01_root_disk_type}"
-    template = "${var.IHSLibertyV855Node01-image}"
-    datastore = "${var.IHSLibertyV855Node01_root_disk_datastore}"
-    keep_on_remove = "${var.IHSLibertyV855Node01_root_disk_keep_on_remove}"
-    controller_type = "${var.IHSLibertyV855Node01_root_disk_controller_type}"
-  }
-
-  # Specify the connection
+  disks = ["${var.IHSLibertyV855Node01_root_disk_size}"]
+  dedicated_acct_host_only = "${var.IHSLibertyV855Node01_dedicated_acct_host_only}"
+  local_disk = "${var.IHSLibertyV855Node01_local_disk}"
+  ssh_key_ids = ["${data.ibm_compute_ssh_key.ibm_pm_public_key.id}"]
+  # Specify the ssh connection
   connection {
-    type = "ssh"
-    user = "${var.IHSLibertyV855Node01-os_admin_user}"
-    password = "${var.IHSLibertyV855Node01-os_password}"
+    user = "${var.IHSLibertyV855Node01-os_admin_user == "" ? lookup(var.default_os_admin_user, var.IHSLibertyV855Node01-image) : var.IHSLibertyV855Node01-os_admin_user}"
+    private_key = "${base64decode(var.ibm_pm_private_ssh_key)}"
   }
 
   provisioner "file" {
@@ -358,47 +356,34 @@ resource "vsphere_virtual_machine" "IHSLibertyV855Node01" {
 # =================================================================
 #!/bin/bash
 
-if (( $# != 3 )); then
-echo "usage: arg 1 is user, arg 2 is public key, arg3 is CAMC Public Key"
-exit -1
+if (( $# != 2 )); then
+    echo "usage: arg 1 is user, arg 2 is public key"
+    exit -1
 fi
 
-userid="$1"
-ssh_key="$2"
-camc_ssh_key="$3"
+userid=$1
+ssh_key=$2
+
+if [[ $ssh_key = 'None' ]]; then
+  echo "skipping add, 'None' specified"
+  exit 0
+fi
 
 user_home=$(eval echo "~$userid")
 user_auth_key_file=$user_home/.ssh/authorized_keys
-echo "$user_auth_key_file"
 if ! [ -f $user_auth_key_file ]; then
-echo "$user_auth_key_file does not exist on this system, creating."
-mkdir $user_home/.ssh
-chmod 700 $user_home/.ssh
-touch $user_home/.ssh/authorized_keys
-chmod 600 $user_home/.ssh/authorized_keys
+  echo "$user_auth_key_file does not exist on this system"
+  exit -1
 else
-echo "user_home : $user_home"
+  echo "user_home --> $user_home"
 fi
 
-if [[ $ssh_key = 'None' ]]; then
-echo "skipping user key add, 'None' specified"
-else
-echo "$user_auth_key_file"
-echo "$ssh_key" >> "$user_auth_key_file"
+echo $ssh_key >> $user_auth_key_file
 if [ $? -ne 0 ]; then
-echo "failed to add to $user_auth_key_file"
-exit -1
+  echo "failed to add to $user_auth_key_file"
+  exit -1
 else
-echo "updated $user_auth_key_file"
-fi
-fi
-
-echo "$camc_ssh_key" >> "$user_auth_key_file"
-if [ $? -ne 0 ]; then
-echo "failed to add to $user_auth_key_file"
-exit -1
-else
-echo "updated $user_auth_key_file"
+  echo "updated $user_auth_key_file"
 fi
 
 EOF
@@ -408,7 +393,7 @@ EOF
   provisioner "remote-exec" {
     inline = [
       "bash -c 'chmod +x IHSLibertyV855Node01_add_ssh_key.sh'",
-      "bash -c './IHSLibertyV855Node01_add_ssh_key.sh  \"${var.IHSLibertyV855Node01-os_admin_user}\" \"${var.user_public_ssh_key}\" \"${var.ibm_pm_public_ssh_key}\">> IHSLibertyV855Node01_add_ssh_key.log 2>&1'"
+      "bash -c './IHSLibertyV855Node01_add_ssh_key.sh  \"${var.IHSLibertyV855Node01-os_admin_user}\" \"${var.user_public_ssh_key}\">> IHSLibertyV855Node01_add_ssh_key.log 2>&1'"
     ]
   }
 
@@ -419,7 +404,7 @@ EOF
 #########################################################
 
 resource "camc_bootstrap" "IHSLibertyV855Node01_chef_bootstrap_comp" {
-  depends_on = ["camc_vaultitem.VaultItem","vsphere_virtual_machine.IHSLibertyV855Node01"]
+  depends_on = ["camc_vaultitem.VaultItem","ibm_compute_vm_instance.IHSLibertyV855Node01"]
   name = "IHSLibertyV855Node01_chef_bootstrap_comp"
   camc_endpoint = "${var.ibm_pm_service}/v1/bootstrap/chef"
   access_token = "${var.ibm_pm_access_token}"
@@ -427,10 +412,10 @@ resource "camc_bootstrap" "IHSLibertyV855Node01_chef_bootstrap_comp" {
   trace = true
   data = <<EOT
 {
-  "os_admin_user": "${var.IHSLibertyV855Node01-os_admin_user}",
+  "os_admin_user": "${var.IHSLibertyV855Node01-os_admin_user == "default"? lookup(var.default_os_admin_user, var.IHSLibertyV855Node01-image) : var.IHSLibertyV855Node01-os_admin_user}",
   "stack_id": "${random_id.stack_id.hex}",
   "environment_name": "_default",
-  "host_ip": "${vsphere_virtual_machine.IHSLibertyV855Node01.network_interface.0.ipv4_address}",
+  "host_ip": "${var.IHSLibertyV855Node01-mgmt-network-public == "false" ? ibm_compute_vm_instance.IHSLibertyV855Node01.ipv4_address_private : ibm_compute_vm_instance.IHSLibertyV855Node01.ipv4_address}",
   "node_name": "${var.IHSLibertyV855Node01-name}",
   "node_attributes": {
     "ibm_internal": {
@@ -460,10 +445,10 @@ resource "camc_softwaredeploy" "IHSLibertyV855Node01_ihs-liberty-nonadmin" {
   trace = true
   data = <<EOT
 {
-  "os_admin_user": "${var.IHSLibertyV855Node01-os_admin_user}",
+  "os_admin_user": "${var.IHSLibertyV855Node01-os_admin_user == "default"? lookup(var.default_os_admin_user, var.IHSLibertyV855Node01-image) : var.IHSLibertyV855Node01-os_admin_user}",
   "stack_id": "${random_id.stack_id.hex}",
   "environment_name": "_default",
-  "host_ip": "${vsphere_virtual_machine.IHSLibertyV855Node01.network_interface.0.ipv4_address}",
+  "host_ip": "${var.IHSLibertyV855Node01-mgmt-network-public == "false" ? ibm_compute_vm_instance.IHSLibertyV855Node01.ipv4_address_private : ibm_compute_vm_instance.IHSLibertyV855Node01.ipv4_address}",
   "node_name": "${var.IHSLibertyV855Node01-name}",
   "runlist": "role[ihs-liberty-nonadmin]",
   "node_attributes": {
@@ -538,7 +523,7 @@ EOT
 }
 
 output "IHSLibertyV855Node01_ip" {
-  value = "VM IP Address : ${vsphere_virtual_machine.IHSLibertyV855Node01.network_interface.0.ipv4_address}"
+  value = "Private : ${ibm_compute_vm_instance.IHSLibertyV855Node01.ipv4_address_private} & Public : ${ibm_compute_vm_instance.IHSLibertyV855Node01.ipv4_address}"
 }
 
 output "IHSLibertyV855Node01_name" {

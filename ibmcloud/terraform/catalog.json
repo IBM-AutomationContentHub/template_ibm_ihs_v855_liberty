@@ -1,5 +1,5 @@
 {
-    "name": "IBM HTTP Server V8.5.5 Liberty ready on a single virtual machine - VMware vSphere",
+    "name": "IBM HTTP Server V8.5.5 Liberty ready on a single virtual machine - IBM",
     "description": "This template deploys IBM HTTP Server V8.5.5 on a single virtual machine ready for use with WebSphere Liberty Server.",
     "version": "1.0.2",
     "imageUrl": "",
@@ -9,7 +9,7 @@
     "manifest": {
       "template_type": "Terraform",
       "template_format": "HCL",
-      "template_provider": "VMware vSphere",
+      "template_provider": "IBM",
       "template": {
         "templateData": "",
         "templateVariables": "",
@@ -18,17 +18,17 @@
       "template_source": {
         "githubRepoUrl": "",
         "githubAccessToken": "",
-        "relativePathToTemplateFolder": "vmware/terraform",
+        "relativePathToTemplateFolder": "ibmcloud/terraform",
         "templateFileName": "ibm_ihs_v855_liberty.tf"
       }
     },
     "metadata": {
       "displayName": "IBM HTTP Server V8.5.5 Liberty ready on a single virtual machine",
-      "providerDisplayName": "VMware vSphere",
+      "providerDisplayName": "IBM",
       "longDescription": "This template deploys IBM HTTP Server V8.5.5 on a single virtual machine ready for use with WebSphere Liberty Server.",
       "bullets": [{
     "title": "Clouds",
-    "description": " VMware<br>"},
+    "description": " IBM<br>"},
 {
     "title": "Template Version",
     "description": "1.0.2<br>"},
@@ -43,7 +43,7 @@
     "description": "IBM HTTP Server for WebSphere Application Server V8.5.5<br>IBM SDK, Java Technology Edition V8<br>"},
 {
     "title": "Default Virtual Machine Settings",
-    "description": " vCPU 2, Memory (GB) 4<br>"},
+    "description": " Cores 2, RAM (GB) 4, SAN Disk (GB) 25<br>"},
 {
     "title": "Usage and Special Notes",
     "description": "1. The user is responsible for obtaining appropriate software licenses and downloads prior to template deployment.<br>2. IBM Knowledge Center for IBM HTTP Server V8.5.5 - <a href=\"https://www.ibm.com/support/knowledgecenter/en/SSEQTJ_8.5.5/com.ibm.websphere.ihs.doc/ihs/welcome_ihs.html\" target=\"_blank\">https://www.ibm.com/support/knowledgecenter/en/SSEQTJ_8.5.5/com.ibm.websphere.ihs.doc/ihs/welcome_ihs.html</a><br>3. IBM Support Portal - <a href=\"https://www.ibm.com/support/home/\" target=\"_blank\">https://www.ibm.com/support/home/</a><br>"}
